@@ -1,0 +1,5 @@
+.vevn
+.vevn/
+
+__pycache__
+db.sqlite3

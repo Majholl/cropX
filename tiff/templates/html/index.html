@@ -1,0 +1,26 @@
+<!DOCTYPE html> 
+<html >
+
+
+<head>
+{% load static %}
+    <script src="{% static 'js/index.js' %}"></script>
+    <title>CropX</title>
+</head>
+
+<body >
+   
+
+    <form id='uploadImageFrom' action="{% url 'show-image-page' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="upload images">Upload TIFF Image format</label>
+            <br><br>
+        <input type="file" name="tiff-image" accept=".tiff,.tif">
+            <br><br>
+        <button id='submitbtn' type="submit">Submit</button>
+        <p id="loadingmsg" style="display: none;">::. Proccesing .::</p>
+    </form>
+
+    
+</body>
+</html>
