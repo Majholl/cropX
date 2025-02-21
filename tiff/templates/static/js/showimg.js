@@ -17,7 +17,7 @@ document.addEventListener('click', async function (event){
             imagepath : ImgSrc,
             imageangle : RotateAngle};
 
-        let response = await fetch('http://127.0.0.1:8000/rotate/' , {
+        let response = await fetch(`http://${window.location.host}/rotate/` , {
             method:'POST',
             headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
             body : JSON.stringify(dataToSendServer)});
@@ -55,7 +55,7 @@ document.addEventListener('click' , async function(event){
         const dataToSendServer = {
             imagepath : ImgSrc};
 
-        let response = await fetch('http://127.0.0.1:8000/remove/' , {
+        let response = await fetch(`http://${window.location.host}/remove/` , {
             method:'POST',
             headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
             body : JSON.stringify(dataToSendServer)});
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             imagepath : sortedList,};
 
 
-        let response = await fetch('http://127.0.0.1:8000/reorder/' , {
+        let response = await fetch(`http://${window.location.host}/reorder/` , {
             method:'POST',
             headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
             body : JSON.stringify(dataToSendServer),});

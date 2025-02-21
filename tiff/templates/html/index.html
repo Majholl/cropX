@@ -10,15 +10,15 @@
 
 <body >
    
-
-    <form id='uploadImageFrom' action="{% url 'show-image-page' %}" method="post" enctype="multipart/form-data">
+    
+    <form id='imform' action="{% url 'show-image-page' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="upload images">Upload TIFF Image format</label>
             <br><br>
         <input type="file" name="tiff-image" accept=".tiff,.tif">
             <br><br>
         <button id='submitbtn' type="submit">Submit</button>
-        <p id="loadingmsg" style="display: none;">::. Proccesing .::</p>
+        <p id="loadingmsg" style="display: none;">::... Proccesing ...::</p>
     </form>
 
     

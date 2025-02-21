@@ -6,7 +6,7 @@ import random , string , os , json
 from PIL import Image 
 from time import time
 from .utils.utils import write_in_storage , load_saved_images , StreamDownloadFile
-
+import zipfile
 
 
 def UploadIMagePage(request):
@@ -95,9 +95,13 @@ def UpdateAndSave(request):
         AccessReqBody = json.loads(request.body)
         BasedirMedia = settings.MEDIA_ROOT
         UserImgpath = os.path.join(BasedirMedia , request.session['userid'])
-        
-
         ImagePath =[]
+        if not AccessReqBody['imagepath']:
+            for images in os.listdir(UserImgpath)[1:]:
+                GenerateImgPath = os.path.join(UserImgpath , images)
+                ImagePath.append(GenerateImgPath)
+        
+        
         for i in AccessReqBody['imagepath']:
             SplitPath = i.split('/')
             GenerateImgPath = os.path.join(BasedirMedia , SplitPath[2] , SplitPath[3])
@@ -109,7 +113,6 @@ def UpdateAndSave(request):
             Imagess.append(Image.open(path))
         NewFileName =  f'EditedImg.tiff'
         OutPutImg = os.path.join(UserImgpath , NewFileName)
-        
 
         try:
             Imagess[0].save(OutPutImg , save_all=True , append_images = Imagess[1:] , format="TIFF" , compression='tiff_deflate')
