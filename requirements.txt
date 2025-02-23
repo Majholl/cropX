@@ -1,0 +1,9 @@
+asgiref==3.8.1
+Django==5.1.6
+django-background-tasks==1.2.8
+django-cors-headers==4.7.0
+django-crontab==0.7.1
+pillow==11.1.0
+six==1.17.0
+sqlparse==0.5.3
+tzdata==2025.1

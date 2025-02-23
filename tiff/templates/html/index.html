@@ -1,0 +1,39 @@
+<!DOCTYPE html> 
+<html >
+
+
+<head>
+{% load static %}
+    <script src="{% static 'js/index.js' %}"></script>
+    <link rel='stylesheet' type="text/css" href="{% static '/css/index.css' %}">
+    <title>CropX</title>
+</head>
+
+<body >
+   
+    <div class="main">
+        <form id='imform' action="{% url 'show-image-page' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="upload images" >Upload TIFF Image format</label>
+                <br><br>
+
+            <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                
+            </div>    
+
+            <div class="custom-file">
+            <input type="file" class="custom-file-input " id="inputGroupFile01" name="tiff-image" accept=".tiff,.tif"  >
+            <label class="custom-file-label" for="inputGroupFile01">فایل انتخاب کنید</label>
+            </div>
+            </div>
+
+            
+                <br><br>
+            <button id='submitbtn' type="submit">Submit</button>
+            <p id="loadingmsg" style="display: none;">::... Proccesing ...::</p>
+        </form>
+    </div>
+    
+</body>
+</html>
