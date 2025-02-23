@@ -22,11 +22,24 @@ document.addEventListener('click', async function (event){
             headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
             body : JSON.stringify(dataToSendServer)});
 
+
+
         let result = await response.json();
         if (result.status == 200){
-            let ImgElement = document.querySelector(`img[data-src="${ImgSrc}"`);
-            ImgElement.src = result.data};
+            console.log(result.data)
+            
+            let ImgElement = document.querySelector(`img[data-src="${ImgSrc}"]`);
+            let queryonDataSrc = document.querySelectorAll(`[data-src=${CSS.escape(ImgSrc)}]`);
 
+            ImgElement.src = result.data;
+
+            queryonDataSrc.forEach(elm =>{
+                elm.setAttribute('data-src', result.data);
+            })}
+
+        else{
+            alert(result.data)
+        }
 };
 })
 
@@ -84,36 +97,68 @@ document.addEventListener('DOMContentLoaded', async function () {
     new Sortable(document.getElementById("image-list"), {
         animation: 150,
         ghostClass: "dragging",
-        onEnd: function (evt) {
+        onEnd: async function (evt) {
+
             sortedList = Array.from(evt.from.children).map(item => item.dataset.src);
+            const csrfToken = document.cookie.split(';');
+
+            let csrfTokenValue = '';
+            csrfToken.forEach(cookie =>{
+            let [name , value ] =cookie.trim().split('=');
+            csrfTokenValue = value;});
+
+            const dataToSendServer = {imageorder : sortedList,};
+
+
+            let response = await fetch(`http://${window.location.host}/reorder/` , {
+                method:'POST',
+                headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
+                body : JSON.stringify(dataToSendServer),});
+                    
+
+            let result = await response.json();
+                if (result.status == 200){
+                    console.log(result.data)};
+
             console.log('sorted Order ' , sortedList)}});
 
+})    
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    let saveInput = document.getElementById('reordersaveing');
+    if (saveInput) {
+        saveInput.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let saveInput = document.getElementById('saveandoutput');
             
-    document.getElementById('reordersaveing').addEventListener('submit' , async function (event){
-        event.preventDefault();
+            saveInput.disabled = true;
+            saveInput.textContent = 'Downloading process started';
+            const csrfToken = document.cookie.split(';');
+            let csrfTokenValue = '';
+            csrfToken.forEach(cookie => {
+                let [name, value] = cookie.trim().split('=');
+                csrfTokenValue = value;
+            });
 
+            let response = await fetch(`http://${window.location.host}/download/`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json', 'X-CSRFToken': csrfTokenValue },
+                body: JSON.stringify({ data: 'download the file' }),
+            });
 
-        const csrfToken = document.cookie.split(';');
-        let csrfTokenValue = '';
-        csrfToken.forEach(cookie =>{
-            let [name , value ] =cookie.trim().split('=');
-            csrfTokenValue = value;
-        });
-
-
-        const dataToSendServer = {
-            imagepath : sortedList,};
-
-
-        let response = await fetch(`http://${window.location.host}/reorder/` , {
-            method:'POST',
-            headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
-            body : JSON.stringify(dataToSendServer),});
-        
-
-        let result = await response.json();
-        if (result.status == 200){
-            console.log(result.data)};
-
-    });
+            let result = await response.json();
+                if (result.status == 200) {
+                    console.log(response.status)
+        };
+    
+})
+}
 })
