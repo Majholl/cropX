@@ -71,8 +71,9 @@
   🚀 The server is running! Click here to open it in your browser.
 </a>
 
-
+ - "See the file <b>cropX/tiff/management/commands/removeImgdir.py</b> for running a cron job that removes unused directories after a certain period to prevent disk space from being filled up."
 <hr>
+
 
 #### License
 
