@@ -64,7 +64,7 @@ def ShowImages(request):
             thread.join() # end of the thread activity 
             request.session['tiffname'] = ImageForm.name
             request.session['imagesorder'] = ImagesPath 
-            
+            print(ImagesPath)
         except Exception as err:
             return render(request , 'html/notupladed.html', {'status':500 , 'msg':'server side error back to upload page'})
         
@@ -184,21 +184,36 @@ def SaveAndDownload(request):
             '''
 
             BasedirMedia = settings.MEDIA_ROOT
-            UserOrder = request.session['imagesorder']
-            
+            UserOrder = request.session.get('imagesorder')   
             UserSessionId = request.session.get('userid')
+
+            if not UserOrder or not UserSessionId:
+                return JsonResponse({'status': 400, 'data': 'Invalid session data'})
+
+            
+            check_files = os.path.join(BasedirMedia , UserSessionId)
+            if not os.path.exists(check_files):
+                return JsonResponse({'status': 404, 'data': 'User directory not found'})
+           
+           
             Images = []
             for images in UserOrder:
                 splitImagePath = os.path.normpath(images).split(os.sep)
                 UserImgpath = os.path.join(BasedirMedia , splitImagePath[2] , splitImagePath[3])
                 Images.append(Image.open(UserImgpath))
   
-            NewFileName =  f'{int(time.time())}_EditedImg.tiff'
+            if not images:
+                return JsonResponse({'status': 400, 'data': 'No valid images found'})
+
+            
+            NewFileName =  f'EditedImg.tiff'
             OutPutImg = os.path.join(BasedirMedia , UserSessionId  , NewFileName)
             Images[0].save(OutPutImg , save_all=True , append_images = Images[1:] , format="TIFF" , compression='tiff_deflate')
 
         except Exception as err:
             return JsonResponse({'status':103 , 'data':f"An error occurred while creating the new TIFF file {err}"})
+
+
 
         try:
             '''

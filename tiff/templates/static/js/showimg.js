@@ -132,15 +132,17 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
+
+
 document.addEventListener('DOMContentLoaded', function() {
     let saveInput = document.getElementById('reordersaveing');
     if (saveInput) {
         saveInput.addEventListener('submit', async function(event) {
             event.preventDefault();
-            let saveInput = document.getElementById('saveandoutput');
+            let buttonText = document.getElementById('saveandoutput');
             
-            saveInput.disabled = true;
-            saveInput.textContent = 'Downloading process started';
+            buttonText.disabled = true;
+            buttonText.textContent = 'Downloading process started';
             const csrfToken = document.cookie.split(';');
             let csrfTokenValue = '';
             csrfToken.forEach(cookie => {
@@ -162,3 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 }
 })
+
+
+
+

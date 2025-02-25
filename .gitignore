@@ -4,3 +4,6 @@ ECHO is on.
 
 __pycache__
 db.sqlite3
+multi_page.tif
+test.tif
+/media
