@@ -10,7 +10,7 @@ def write_in_storage(TIFF_path , IMAGE_form):
     with open(TIFF_path , 'wb') as f:
         for chnk in IMAGE_form.chunks(): # chunks for better memory handling
             f.write(chnk)
-    
+    f.close()
     
 
 def load_saved_images(TIFF_path , IMAGE_form , USER_mediadir , USER_sessionid , RESULT_lists):
@@ -26,6 +26,7 @@ def load_saved_images(TIFF_path , IMAGE_form , USER_mediadir , USER_sessionid , 
                 page.save(ImagePath , 'PNG')
                 ImageURLpath.append(f"/media/{USER_sessionid}/{ImageFileName}")
                 
+
         RESULT_lists.extend(ImageURLpath)
     except Exception as err:
         return f'error while load images {err}'        
