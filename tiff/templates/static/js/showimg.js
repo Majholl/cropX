@@ -1,82 +1,17 @@
-document.addEventListener('DOMContentLoaded' , async function() {
-
-    let scrollCointainer = document.querySelector('.container-images');
-    let backbtn = document.getElementById('previous-img');
-    let nxtbtn = document.getElementById('next-img');
-
-    scrollCointainer.addEventListener('wheel', (evnt)=>{
-        
-        scrollCointainer.scrollLeft += evnt.deltaY;
-    }  , {passive: true})
-
-
-    nxtbtn.addEventListener('click' , (event)=>{
-        event.preventDefault();
-        scrollCointainer.scrollLeft += 900;
-
-    })
-
-    backbtn.addEventListener('click' , (event)=>{
-        event.preventDefault();
-        scrollCointainer.scrollLeft -= 900;
-        
-    })
-
-})
-
-
-
-
-
-
-
-
-const activeImg = function(event) {
-    event.preventDefault();
-    let imgactivate = event.target
-    let showImgsbtndiv = document.getElementById('imgsbuttondiv');
-    showImgsbtndiv.style.display = 'flex';
-
-    let baseurl = `${window.location.protocol}//${window.location.host}`
-    let imgNewUrl = imgactivate.src.replace(baseurl, "");
-
-    let dropdownItems = document.getElementsByClassName('dropdown-item');
-    let btnDanger = document.getElementById('removebtn').setAttribute('data-src' , imgNewUrl)
-    let getImgs = document.getElementsByClassName('img-class');
-
-    for (let i=0 ; i < getImgs.length ; i++){
-        getImgs[i].classList.remove('active');}
-
-
-   for(let i=0; i < dropdownItems.length ; i++){
-        dropdownItems[i].setAttribute('data-src' ,imgNewUrl)}
-
-   imgactivate.classList.add('active')  
-}
-
-
-
-
-
-
-
-
-
-
-
 document.addEventListener('click', async function (event) {
     if (event.target.classList.contains('dropdown-item')) {
         event.preventDefault();
     
         let RotateAngle = parseInt(event.target.getAttribute('data-rotate'));
         let ImgSrc = event.target.getAttribute('data-src');
-
+        
 
         const csrfToken = document.cookie.split(';');
         let csrfTokenValue = '';
         csrfToken.forEach(cookie => {
             let [name, value] = cookie.trim().split('=');
-            csrfTokenValue = value;
+            if (name =='csrftoken'){
+            csrfTokenValue = value;}
         });
 
         const dataToSendServer = {
@@ -94,13 +29,13 @@ document.addEventListener('click', async function (event) {
             });
 
             let result = await response.json();
-            if (result.status == 200) {
-                let ImgElement = document.querySelector(`img[src="${ImgSrc}"]`);
-                ImgElement.src = result.data;
-
-                console.log(':-Img requested rotated-:');}
-
-
+            if (result.status == 200) { 
+                let ImgElement = document.querySelector(`img[data-src="${ImgSrc}"]`);
+                let newSrc = result.data + "?t=" + new Date().getTime(); 
+                ImgElement.src = newSrc
+                console.log("ImgElement Rotated successfully")
+            }
+                
         } catch (err) {
             console.log("Error updating image:", err);
         }
@@ -112,20 +47,190 @@ document.addEventListener('click', async function (event) {
 
 
 
-
-
-
-document.addEventListener('click' , async function(event){
-    if (event.target.classList.contains('delete-btn')){
+document.addEventListener('click', async function(event) {
+   
+    // if the soft delete button called 
+    if (event.target.classList.contains('softdelete-btn')) {
+        let ImgSrc = event.target.getAttribute('data-src');
+        let softRemove = document.querySelector(`[data-src="${ImgSrc}"]`);
         event.preventDefault();
 
+        if (softRemove) {
+            event.preventDefault();
+            // Remove exisiting elements and replace them with new buttons 
+            softRemove.querySelector('a').remove();
+            softRemove.querySelector('div').remove();
+
+            let pInfo = document.createElement('p');
+            pInfo.classList.add('removeimgp');
+            pInfo.textContent = 'The image has been removed';
+            softRemove.appendChild(pInfo);
+
+           
+            let btonUndo = document.createElement('button');
+            btonUndo.type = 'submit';
+            btonUndo.classList.add('btn', 'btn-light', 'funbtns', 'undo-btn');
+            btonUndo.id = 'Undo';
+            btonUndo.setAttribute('data-src', ImgSrc);
+
+            let iIconUndo = document.createElement('i');
+            iIconUndo.classList.add('fa', 'fa-rotate-left');
+            btonUndo.appendChild(iIconUndo);
+            btonUndo.appendChild(document.createTextNode(' Undo'));
+
+           
+            let btonPermDelete = document.createElement('button');
+            btonPermDelete.type = 'submit';
+            btonPermDelete.classList.add('btn', 'btn-light', 'funbtns', 'harddelete-btn');
+            btonPermDelete.id = 'removebtnhard';
+            btonPermDelete.setAttribute('data-src', ImgSrc);
+
+            let iIconPermDelete = document.createElement('i');
+            iIconPermDelete.classList.add('fa', 'fa-trash');
+            btonPermDelete.appendChild(iIconPermDelete);
+            btonPermDelete.appendChild(document.createTextNode(' Permanent Delete'));
+
+            softRemove.appendChild(btonUndo);
+            softRemove.appendChild(btonPermDelete);
+        
+
+
+            // send acknowldge to the server 
+            const csrfToken = document.cookie.split(';');
+            let csrfTokenValue = '';
+            csrfToken.forEach(cookie => {
+                let [name, value] = cookie.trim().split('=');
+                if (name =='csrftoken'){
+                csrfTokenValue = value;}});
+
+            const dataToSendServer = {imagepath : ImgSrc , softdelete:1};
+
+            try {
+                let response = await fetch(`${window.location.protocol}//${window.location.host}/softdelete/` , {
+                method:'POST',
+                headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
+                body : JSON.stringify(dataToSendServer)});
+
+                let result = await response.json();
+                if (result.status == 200){console.log('server acknowldgment sent - softDelete')}
+            } catch (err) {console.log("Error removing image:", err);}
+        }
+
+    }
+
+   
+    if (event.target.classList.contains('undo-btn')) {
+        event.preventDefault();
         let ImgSrc = event.target.getAttribute('data-src');
-       
+        let undoFunc = document.querySelector(`[data-src="${ImgSrc}"]`);
+        if (undoFunc) {
+            undoFunc.querySelector('p').remove();
+            undoFunc.querySelectorAll('button').forEach(button => button.remove());
+
+            
+            let createAtag = document.createElement('a');
+            createAtag.href = ImgSrc;
+            createAtag.setAttribute("data-lightbox", "mygallery");
+            createAtag.setAttribute("data-src", ImgSrc);
+
+            let createImg = document.createElement('img');
+            createImg.src = ImgSrc;
+            createImg.classList.add("img-class");
+            createImg.setAttribute("data-src", ImgSrc);
+            createImg.style.width = '350px';
+            createImg.style.height = '450px';
+
+            createAtag.appendChild(createImg);
+            undoFunc.appendChild(createAtag);
+
+            
+            const div = document.createElement('div');
+            div.setAttribute('id', 'imgsbuttons-id');
+            div.setAttribute('class', 'imgsbuttons-cls');
+
+           
+            const rotateButton = document.createElement('button');
+            rotateButton.setAttribute('type', 'button');
+            rotateButton.setAttribute('class', 'btn btn-light funbtns dropdown-toggle');
+            rotateButton.setAttribute('id', 'rotateimg');
+            rotateButton.setAttribute('data-bs-toggle', 'dropdown');
+
+            const rotateIcon = document.createElement('i');
+            rotateIcon.setAttribute('class', 'fa fa-sync fa-solid');
+            rotateButton.appendChild(rotateIcon);
+            rotateButton.appendChild(document.createTextNode(' Rotate '));
+
+            const ul = document.createElement('ul');
+            ul.setAttribute('class', 'dropdown-menu');
+
+            const rotationAngles = [45, 90, 180, 270, 360];
+            rotationAngles.forEach(angle => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.setAttribute('class', 'dropdown-item');
+                a.setAttribute('id', 'dropdownitem');
+                a.setAttribute('data-rotate', angle);
+                a.setAttribute('data-src', ImgSrc);  
+                a.appendChild(document.createTextNode(`${angle} Deg`));
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+
+            div.appendChild(rotateButton);
+            div.appendChild(ul);
+
+            
+            const deleteButton = document.createElement('button');
+            deleteButton.setAttribute('type', 'submit');
+            deleteButton.setAttribute('class', 'btn btn-light funbtns softdelete-btn');
+            deleteButton.setAttribute('id', 'removebtn');
+            deleteButton.setAttribute('data-src', ImgSrc);
+
+            const deleteIcon = document.createElement('i');
+            deleteIcon.setAttribute('class', 'fa fa-trash');
+            deleteButton.appendChild(deleteIcon);
+            deleteButton.appendChild(document.createTextNode(' Delete '));
+
+            div.appendChild(deleteButton);
+            undoFunc.appendChild(div);
+
+
+            // send acknowldge to the server 
+            const csrfToken = document.cookie.split(';');
+            let csrfTokenValue = '';
+            csrfToken.forEach(cookie => {
+                let [name, value] = cookie.trim().split('=');
+                if (name =='csrftoken'){
+                csrfTokenValue = value;}});
+
+            const dataToSendServer = {imagepath : ImgSrc , softdelete:0};
+
+            try {
+                let response = await fetch(`${window.location.protocol}//${window.location.host}/softdelete/` , {
+                method:'POST',
+                headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
+                body : JSON.stringify(dataToSendServer)});
+
+                let result = await response.json();
+                if (result.status == 200){console.log('server acknowldgment sent - undo')}
+            } catch (err) {console.log("Error removing image:", err);}
+
+        }
+    }
+
+
+    if (event.target.classList.contains('harddelete-btn')) {
+        let ImgSrc = event.target.getAttribute('data-src');
+        let hardRemove = document.querySelector(`[data-src="${ImgSrc}"]`);
+        event.preventDefault();
+        
+        
         const csrfToken = document.cookie.split(';');
         let csrfTokenValue = '';
-        csrfToken.forEach(cookie =>{
-            let [name , value ] =cookie.trim().split('=');
-            csrfTokenValue = value;
+        csrfToken.forEach(cookie => {
+            let [name, value] = cookie.trim().split('=');
+            if (name =='csrftoken'){
+            csrfTokenValue = value;}
         });
 
         const dataToSendServer = {
@@ -139,14 +244,10 @@ document.addEventListener('click' , async function(event){
 
             let result = await response.json();
             if (result.status == 200){
-                let RemoveImg = document.querySelector(`img[data-src="${ImgSrc}"]`);
-                RemoveImg.closest('.images-list').remove()
-                console.log(`Image removed successfully`);}
-                let showImgsbtndiv = document.getElementById('imgsbuttondiv');
-                showImgsbtndiv.style.display = 'none';
-
+               hardRemove.remove()
+            }
         } catch (err) {
-
+            
             console.log("Error removing image:", err);
         }
 
@@ -155,12 +256,7 @@ document.addEventListener('click' , async function(event){
 
 
 
-
-
-
-
-
-
+        
 document.addEventListener('DOMContentLoaded', async function () {
     let sortedList = [];
     
@@ -175,12 +271,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             let csrfTokenValue = '';
             csrfToken.forEach(cookie =>{
             let [name , value ] =cookie.trim().split('=');
-            csrfTokenValue = value;});
-
+            if (name =='csrftoken'){
+                csrfTokenValue = value;}});
+            
             const dataToSendServer = {imageorder : sortedList,};
 
 
-            let response = await fetch(`http://${window.location.host}/reorder/` , {
+            let response = await fetch(`${window.location.protocol}//${window.location.host}/reorder/` , {
                 method:'POST',
                 headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
                 body : JSON.stringify(dataToSendServer),});
@@ -204,37 +301,30 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    let saveInput = document.getElementById('reordersaveing');
-    if (saveInput) {
-        saveInput.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            let buttonText = document.getElementById('saveandoutput');
-            let disableFeatures = document.getElementById('imgsbuttondiv').style.display = 'none'
-            buttonText.disabled = true;
-            buttonText.textContent = 'Downloading process started';
-            let userId = document.getElementById('reordersaveing').getAttribute('action').split('/')[2];
-            const csrfToken = document.cookie.split(';');
-            let csrfTokenValue = '';
-            csrfToken.forEach(cookie => {
-                let [name, value] = cookie.trim().split('=');
-                csrfTokenValue = value;
-            });
 
-            let response = await fetch(`http://${window.location.host}/download/`, {
-                method: 'POST',
-                headers: { 'content-type': 'application/json', 'X-CSRFToken': csrfTokenValue },
-                body: JSON.stringify({ data: 'download the file' }),
-            });
 
-            let result = await response.json();
-                if (result.status == 200) {
-                    console.log(response.status)
-        };
-    
-})
-}
-})
+
+
+
+document.addEventListener('DOMContentLoaded', async function() {
+    let formCalling = document.getElementById('reordersaveing'); 
+
+    formCalling.addEventListener('submit', function(event) {
+        
+        let downloadBtn = document.getElementById('saveandoutput');
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = 'Downloading...';
+
+        
+        formCalling.submit(); 
+    });
+});
+
+
+
+
+
+
 
 
 

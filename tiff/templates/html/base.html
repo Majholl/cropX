@@ -1,0 +1,62 @@
+<!DOCTYPE html> 
+<html >
+
+
+<head>
+{% load static %}
+    <script src="{% static 'js/index.js' %}"></script>
+    <link rel='stylesheet' type="text/css" href="{% static '/css/index.css' %}">
+    <link href="{% static '../static/fontawesome/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="{% static 'icon/Capture.JPG' %}">
+    <title>CropX</title>
+</head>
+
+<body >
+
+    <ul class="ulheader">
+        <li class="liheader"><i class="fa fa-house"></i><a class="aheader" href="http://127.0.0.1:8000/">home page</a></li>
+    </ul>
+
+{% block content %}
+
+{% endblock content %}
+
+
+
+
+</body>
+    <style>
+
+    .ulheader {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    list-style: none;
+    font-size: 24px;
+    margin: 20px;
+    background-color: aliceblue;
+    height: 75px;
+    border-radius: 15px;}
+
+    .liheader {width: auto;
+        transition: border-radius;
+        transition-duration: 350ms;
+        transition-delay: 150ms;}
+    
+    .liheader:hover{
+        border-style: solid;
+        border-width: 0 0 2px 0 ;
+        border-radius: 5px;}
+
+    .fa-house {
+        margin: 5px;}
+
+    .aheader { 
+        font-weight: bold;
+        text-decoration: none;
+        color: black;}
+
+
+
+    </style>
+</html>

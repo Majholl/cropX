@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.http import JsonResponse , StreamingHttpResponse
+from django.shortcuts import render , redirect
+from django.http import response
+from django.http import JsonResponse , StreamingHttpResponse 
 from django.conf import settings
 from threading import Thread
 import random , string , os , json , time
@@ -15,7 +16,7 @@ from tiff.utils import write_in_storage , load_saved_images , handle_file_in_chn
 def UploadIMagePage(request):
     
     '''
-        Only render the index.html file for uploading tiff IMG
+        Only render the index.html file for uploading tiff File
     '''
     userId = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
     request.session['userid'] = userId
@@ -28,56 +29,77 @@ def UploadIMagePage(request):
 
 
 
-
-def ShowImages(request):
-    '''
-        This section extracts TIFF IMG's, saves them, 
-        and serves them to the frontend.
-
-        --uses another thread for faster IMG's loading
-
-    '''
-
+def ExtractingImages(request):
+    
+    """
+        Save the tiff file in a directory based on the user-id that stored in request.session 
+        and then exctracting IMG's inside the tiff file and saving them 
+        also render them inside an html file inside 'html/showimages.html'
+        
+        - this function view uses Thread to handle extracting img's
+        
+    """
     if request.method != 'POST':
         return JsonResponse({'status' : 405 , 'msg':'method not supported'}) 
     
 
     ImageForm = request.FILES.get('tiff-image') 
+    prefersaving = request.POST.get('preferinput') 
     UserSessionId = request.session.get('userid')
-        
+
+
     if ImageForm.content_type not in ['image/tiff' , 'image/x-tiff']:
         return render(request , 'html/notuploaded.html', {'status':415 , 'msg':'File not supported'}) 
+        
         
     if not UserSessionId :
         return JsonResponse({'status': 400, 'data': 'Invalid session data'})
 
-    try:
-        ImagesPath = [] # shared list with other thread(core/ process) to access image's extracted 
-        MakeDirBaseOnUser = os.path.join(settings.MEDIA_ROOT , UserSessionId)
-        os.makedirs(MakeDirBaseOnUser , exist_ok=True) 
-                    
-        TiffImagePath = os.path.join(MakeDirBaseOnUser , ImageForm.name) 
-        write_in_storage(TiffImagePath , ImageForm)
 
-         
-        thread = Thread(target=load_saved_images , args=(TiffImagePath , ImageForm , MakeDirBaseOnUser , UserSessionId , ImagesPath))
+    try:
+        ImagesPath = [] # shared list with other thread(core/ process) to access image's extracting
+        MakeDirBaseOnUser = os.path.join(settings.MEDIA_ROOT, UserSessionId)
+        os.makedirs(MakeDirBaseOnUser, exist_ok=True) 
+                    
+        TiffImagePath = os.path.join(MakeDirBaseOnUser, ImageForm.name) 
+        write_in_storage(TiffImagePath, ImageForm)
+
+        thread = Thread(target=load_saved_images, args=(TiffImagePath, ImageForm, MakeDirBaseOnUser, UserSessionId, prefersaving, ImagesPath))
         thread.start()
         thread.join() # end of the thread activity 
 
         request.session['tiffname'] = ImageForm.name
         request.session['imagesorder'] = ImagesPath 
 
-        
-        return render(request , 'html/showimages.html' , {'image_urls':ImagesPath})
-    
+        return redirect('show-images')
+       
     except Exception as err:
         return render(request , 'html/notupladed.html', {'status':500 , 'msg':'Internal server error'})
         
         
-    
-  
-
-
+        
+           
+def ShowImages(request):
+    """
+        render image's into 'html/showimages.html'
+    """
+    try:
+        UserSessionId = request.session.get('userid')
+        ImagesPath = request.session['imagesorder']
+        TiffFileName = request.session['tiffname']
+        
+        ImagesStored = os.path.join(settings.MEDIA_ROOT, UserSessionId)
+        ImagesInsideStorage = os.listdir(ImagesStored)
+        ImagesInsideStorage.remove(TiffFileName)
+        
+        for i in ImagesPath:
+           if not str(os.path.normpath(i).split(os.sep)[-1]) in ImagesInsideStorage:
+               return JsonResponse({'status':410 , 'data':'image not found , gone'})
+                
+        return render(request , 'html/showimages.html' , {'image_urls':ImagesPath})
+    except Exception as err:
+        print(err)
+        return JsonResponse({'status':406 , 'data':'Not acceptable'})
 
 
 
@@ -93,23 +115,25 @@ def RotateImg(request):
         return JsonResponse({'status':405 , 'data':'request not allowed'}) 
     
     try:   
-      
+        
         AccessReqBody = json.loads(request.body) 
         ImagePath = AccessReqBody['imagepath']
         ImageAngle = AccessReqBody['imageangle']  
         BasedirMedia = settings.MEDIA_ROOT
-            
+
+        
         if not ImagePath or not ImageAngle:
             return JsonResponse({'status':406 , 'data':'Not acceptable , need image path and angle'})
                 
         SplitPath = os.path.normpath(ImagePath).split(os.sep)
-        ImagePathDir = os.path.join(BasedirMedia , SplitPath[-2] , SplitPath[-1]) 
-            
+        ImagePathDir = os.path.join(BasedirMedia, SplitPath[-2], SplitPath[-1]) 
+
         OpenImage = Image.open(ImagePathDir)
-        RotateImg = OpenImage.rotate(angle=ImageAngle , expand=True ,fillcolor=(255,255,255))
+        RotateImg = OpenImage.rotate(angle= -ImageAngle, expand=True, fillcolor=(255,255,255))
         RotateImg.save(ImagePathDir)
-        
-        ImageURL = f'/media/{SplitPath[-2]}/{SplitPath[-1]}' 
+    
+        ImageURL = f'/media/{SplitPath[-2]}/{SplitPath[-1]}'
+
         return JsonResponse({'status':200 , 'data' : ImageURL})
         
     except Exception as err:
@@ -117,6 +141,43 @@ def RotateImg(request):
 
 
 
+
+def SoftDelete(request):
+    """
+        this section reciveing acknowldgment for ensuring that img requested to be deleted
+    """
+    if request.method != 'POST':
+        return JsonResponse({'status': 405, 'data': 'Request not allowed'}) 
+
+    try:
+        
+        AccessReqBOdy = json.loads(request.body)   
+        UserSessionId = request.session.get('userid')
+        request.session.setdefault('softdelete', {})
+
+        if UserSessionId not in request.session['softdelete']:
+            request.session['softdelete'][UserSessionId] = []
+
+        soft_delete_dict = request.session['softdelete'][UserSessionId]
+
+
+        imagepath = str(AccessReqBOdy['imagepath'])
+
+        if int(AccessReqBOdy['softdelete']) == 1:
+            if imagepath not in soft_delete_dict: 
+                soft_delete_dict.append(imagepath)
+        else:
+            if imagepath in soft_delete_dict:  
+                soft_delete_dict.remove(imagepath)
+                
+        request.session.save()
+        
+        return JsonResponse({'status': 200, 'data': 'Acknowledgment received'})
+    
+    except Exception as err:
+        print(err)
+        return JsonResponse({'status': 500, 'msg': 'Internal server error'})
+            
 
 
 
@@ -151,7 +212,8 @@ def DeleteImg(request):
 
         if os.path.exists(ImageURL):
             os.remove(ImageURL) 
-
+            
+        
         return JsonResponse({'status':200 , 'data':f'{ImagePath}'}) 
         
     except Exception as err:
@@ -159,7 +221,6 @@ def DeleteImg(request):
              
 
     
-
 
 
 
@@ -223,7 +284,13 @@ def SaveAndDownload(request):
         BasedirMedia = settings.MEDIA_ROOT
         UserOrder = request.session.get('imagesorder')   
         UserSessionId = request.session.get('userid')
+        soft_delete_dict = request.session['softdelete'][UserSessionId]
 
+        for i in soft_delete_dict:
+            if str(i) in UserOrder:
+                UserOrder.remove(str(i))
+                
+        
         if not UserOrder or not UserSessionId:
             return JsonResponse({'status': 400, 'data': 'Invalid session data'})
 

@@ -1,6 +1,6 @@
 from PIL import Image , ImageSequence
 import os 
-
+import time
 
 #save image in the given path
 def write_in_storage(TIFF_path , IMAGE_form):
@@ -13,21 +13,27 @@ def write_in_storage(TIFF_path , IMAGE_form):
     f.close()
     
 
-def load_saved_images(TIFF_path , IMAGE_form , USER_mediadir , USER_sessionid , RESULT_lists):
+def load_saved_images(TIFF_path , IMAGE_form , USER_mediadir , USER_sessionid , prefersaving , RESULT_lists):
+    
     try:
         '''
             Extracting IMG's inside tiff file and saving it on the disk
         '''
+        
+        prefixSaving = 'png' if prefersaving == 'PNG' else 'jpeg'
+
         ImageURLpath = []
         with Image.open(TIFF_path) as opImg:
             for ind , page in enumerate(ImageSequence.Iterator(opImg) , 1):
-                ImageFileName = f'{os.path.splitext(IMAGE_form.name)[0]}_page_{ind}.png'
+                ImageFileName = f'{os.path.splitext(IMAGE_form.name)[0]}_page_{ind}.{prefixSaving}'
                 ImagePath = os.path.join(USER_mediadir , ImageFileName)
-                page.save(ImagePath , 'PNG')
+                page.save(ImagePath , 'PNG' , optimize=True)
                 ImageURLpath.append(f"/media/{USER_sessionid}/{ImageFileName}")
                 
 
         RESULT_lists.extend(ImageURLpath)
+        
+
     except Exception as err:
         return f'error while load images {err}'        
     

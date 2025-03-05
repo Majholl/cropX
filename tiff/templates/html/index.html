@@ -1,19 +1,9 @@
-<!DOCTYPE html> 
-<html >
+{% extends "html/base.html" %}
 
 
-<head>
-{% load static %}
-    <script src="{% static 'js/index.js' %}"></script>
-    <link rel='stylesheet' type="text/css" href="{% static '/css/index.css' %}">
-    <link rel="shortcut icon" href="#">
-    <title>CropX</title>
-</head>
-
-<body >
-   
+{% block content %}   
     <div class="main">
-        <form id='imform' action="{% url 'show-image-page' %}" method="post" enctype="multipart/form-data">
+        <form id='imform' action="{% url 'extracting-images-page' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <label for="upload images " class="label-up">Upload TIFF Image format</label>
             
@@ -24,11 +14,17 @@
                     <label class="custom-file-label" for="inputGroupFile">فایل انتخاب کنید</label>
                 </div>
             </div>
+            <div class="prefersaving">
+                <p>Choise how to save extracted images:</p>
+                <label class="pngprefer">PNG</label>
+                <input type="radio" name="preferinput" value="PNG" checked="checked">
 
+                <label class="jpegprefer">JPEG</label>
+                <input type="radio" name="preferinput" value="JPEG">
+            </div>
             <button id='submitbtn' type="submit">Submit</button>
             <p id="loadingmsg" style="display: none;"> ..:: Proccesing ::..</p>
         </form>
     </div>
     
-</body>
-</html>
+{% endblock content %}
