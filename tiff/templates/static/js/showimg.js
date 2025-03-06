@@ -49,7 +49,7 @@ document.addEventListener('click', async function (event) {
 
 document.addEventListener('click', async function(event) {
    
-    // if the soft delete button called 
+  
     if (event.target.classList.contains('softdelete-btn')) {
         let ImgSrc = event.target.getAttribute('data-src');
         let softRemove = document.querySelector(`[data-src="${ImgSrc}"]`);
@@ -57,13 +57,13 @@ document.addEventListener('click', async function(event) {
 
         if (softRemove) {
             event.preventDefault();
-            // Remove exisiting elements and replace them with new buttons 
+       
             softRemove.querySelector('a').remove();
             softRemove.querySelector('div').remove();
 
             let pInfo = document.createElement('p');
             pInfo.classList.add('removeimgp');
-            pInfo.textContent = 'The image has been removed';
+            pInfo.textContent = 'Are you sure to remove this Image?';
             softRemove.appendChild(pInfo);
 
            
@@ -76,7 +76,7 @@ document.addEventListener('click', async function(event) {
             let iIconUndo = document.createElement('i');
             iIconUndo.classList.add('fa', 'fa-rotate-left');
             btonUndo.appendChild(iIconUndo);
-            btonUndo.appendChild(document.createTextNode(' Undo'));
+            btonUndo.appendChild(document.createTextNode('No , don\'t delete the image'));
 
            
             let btonPermDelete = document.createElement('button');
@@ -88,34 +88,11 @@ document.addEventListener('click', async function(event) {
             let iIconPermDelete = document.createElement('i');
             iIconPermDelete.classList.add('fa', 'fa-trash');
             btonPermDelete.appendChild(iIconPermDelete);
-            btonPermDelete.appendChild(document.createTextNode(' Permanent Delete'));
+            btonPermDelete.appendChild(document.createTextNode('Yes , remove the image'));
 
             softRemove.appendChild(btonUndo);
             softRemove.appendChild(btonPermDelete);
-        
-
-
-            // send acknowldge to the server 
-            const csrfToken = document.cookie.split(';');
-            let csrfTokenValue = '';
-            csrfToken.forEach(cookie => {
-                let [name, value] = cookie.trim().split('=');
-                if (name =='csrftoken'){
-                csrfTokenValue = value;}});
-
-            const dataToSendServer = {imagepath : ImgSrc , softdelete:1};
-
-            try {
-                let response = await fetch(`${window.location.protocol}//${window.location.host}/softdelete/` , {
-                method:'POST',
-                headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
-                body : JSON.stringify(dataToSendServer)});
-
-                let result = await response.json();
-                if (result.status == 200){console.log('server acknowldgment sent - softDelete')}
-            } catch (err) {console.log("Error removing image:", err);}
         }
-
     }
 
    
@@ -194,29 +171,9 @@ document.addEventListener('click', async function(event) {
             div.appendChild(deleteButton);
             undoFunc.appendChild(div);
 
-
-            // send acknowldge to the server 
-            const csrfToken = document.cookie.split(';');
-            let csrfTokenValue = '';
-            csrfToken.forEach(cookie => {
-                let [name, value] = cookie.trim().split('=');
-                if (name =='csrftoken'){
-                csrfTokenValue = value;}});
-
-            const dataToSendServer = {imagepath : ImgSrc , softdelete:0};
-
-            try {
-                let response = await fetch(`${window.location.protocol}//${window.location.host}/softdelete/` , {
-                method:'POST',
-                headers :{'content-type':'application/json' , 'X-CSRFToken':csrfTokenValue},
-                body : JSON.stringify(dataToSendServer)});
-
-                let result = await response.json();
-                if (result.status == 200){console.log('server acknowldgment sent - undo')}
-            } catch (err) {console.log("Error removing image:", err);}
-
         }
     }
+
 
 
     if (event.target.classList.contains('harddelete-btn')) {
@@ -260,7 +217,7 @@ document.addEventListener('click', async function(event) {
 document.addEventListener('DOMContentLoaded', async function () {
     let sortedList = [];
     
-    new Sortable(document.getElementById("orderimglist"), {
+    new Sortable(document.getElementById("imgorder"), {
         animation: 150,
         ghostClass: "dragging",
         onEnd: async function (evt) {
@@ -298,29 +255,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
-
-
-
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', async function() {
     let formCalling = document.getElementById('reordersaveing'); 
 
-    formCalling.addEventListener('submit', function(event) {
-        
+    formCalling.addEventListener('submit', async function(event) {
+        event.preventDefault();
         let downloadBtn = document.getElementById('saveandoutput');
         downloadBtn.disabled = true;
         downloadBtn.textContent = 'Downloading...';
-
-        
+       
         formCalling.submit(); 
+        
     });
 });
-
-
 
 
 

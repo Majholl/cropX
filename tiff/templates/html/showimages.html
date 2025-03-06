@@ -15,7 +15,10 @@
 
 <body>
 {% if image_urls %}
-<span class="span-p"><p class="fullsize-img">برای پیش نمایش بزرگتر عکس ها کلیک کنید</p></span>
+<span class="span-p">
+    <h2 class="fullsize-img">For large preview click on the image</h2>
+    <p class="reorder-img">click on image and move around to change thier order</p>
+</span>
 <form id="reordersaveing" method="post" action="{% url 'save-downlaod' %}">
 <div id="orderimglist">
     <!-- back and download buttons -->
@@ -26,9 +29,12 @@
 
     {% csrf_token %}
     <div  class="img-with-nav">     
-        <div class="container-images" >
+        <div class="container-images" id="imgorder" >
             {% for img in image_urls %}
+           
             <div class="images-list"  draggable="true" data-src="{{ img }}">    
+
+
                 <a href="{{ img }}" data-lightbox="mygallery" >
                     <img src="{{ img }}" alt="TIFF Page {{ forloop.counter }}"  class="img-class"  data-src="{{ img }}" style="width: 350px; height: 450px;">
                 </a>

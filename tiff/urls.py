@@ -1,7 +1,7 @@
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
-from .views import UploadIMagePage , ExtractingImages , ShowImages , RotateImg , SoftDelete , DeleteImg , Reorder ,  SaveAndDownload  
+from .views import UploadIMagePage , ExtractingImages , ShowImages , RotateImg ,  DeleteImg , Reorder ,  SaveAndDownload  
 
 
 '''
@@ -16,9 +16,9 @@ urlpatterns = [
     path("images/", ShowImages, name="show-images"),
     path('rotate/', RotateImg, name='rotate-image'),
     path('remove/', DeleteImg, name='remove-image'),
-    path('softdelete/', SoftDelete, name='soft-image-delete'),
     path('reorder/', Reorder, name='reoder') , 
     path('download/', SaveAndDownload, name='save-downlaod')
+    
 ]
 
 

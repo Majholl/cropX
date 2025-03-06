@@ -142,42 +142,7 @@ def RotateImg(request):
 
 
 
-def SoftDelete(request):
-    """
-        this section reciveing acknowldgment for ensuring that img requested to be deleted
-    """
-    if request.method != 'POST':
-        return JsonResponse({'status': 405, 'data': 'Request not allowed'}) 
 
-    try:
-        
-        AccessReqBOdy = json.loads(request.body)   
-        UserSessionId = request.session.get('userid')
-        request.session.setdefault('softdelete', {})
-
-        if UserSessionId not in request.session['softdelete']:
-            request.session['softdelete'][UserSessionId] = []
-
-        soft_delete_dict = request.session['softdelete'][UserSessionId]
-
-
-        imagepath = str(AccessReqBOdy['imagepath'])
-
-        if int(AccessReqBOdy['softdelete']) == 1:
-            if imagepath not in soft_delete_dict: 
-                soft_delete_dict.append(imagepath)
-        else:
-            if imagepath in soft_delete_dict:  
-                soft_delete_dict.remove(imagepath)
-                
-        request.session.save()
-        
-        return JsonResponse({'status': 200, 'data': 'Acknowledgment received'})
-    
-    except Exception as err:
-        print(err)
-        return JsonResponse({'status': 500, 'msg': 'Internal server error'})
-            
 
 
 
@@ -252,16 +217,6 @@ def Reorder(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
 def SaveAndDownload(request):
     '''
             Retrieve the request.session imageorder to find the paths of the IMG's, 
@@ -284,13 +239,7 @@ def SaveAndDownload(request):
         BasedirMedia = settings.MEDIA_ROOT
         UserOrder = request.session.get('imagesorder')   
         UserSessionId = request.session.get('userid')
-        soft_delete_dict = request.session['softdelete'][UserSessionId]
-
-        for i in soft_delete_dict:
-            if str(i) in UserOrder:
-                UserOrder.remove(str(i))
-                
-        
+      
         if not UserOrder or not UserSessionId:
             return JsonResponse({'status': 400, 'data': 'Invalid session data'})
 
