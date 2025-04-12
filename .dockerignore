@@ -1,9 +1,9 @@
 ECHO is on.
 .vevn
 .vevn/
-
+.git 
+icon 
 __pycache__
 db.sqlite3
 New folder
 readme.md
-.git
