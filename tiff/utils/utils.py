@@ -8,9 +8,10 @@ def write_in_storage(TIFF_path , IMAGE_form):
         Open the Tiff IMG and write it on the disk
     '''
     with open(TIFF_path , 'wb') as f:
-        for chnk in IMAGE_form.chunks(): # chunks for better memory handling
+        for chnk in IMAGE_form.chunks(): 
             f.write(chnk)
     f.close()
+    
     
 
 def load_saved_images(TIFF_path , IMAGE_form , USER_mediadir , USER_sessionid , prefersaving , RESULT_lists):

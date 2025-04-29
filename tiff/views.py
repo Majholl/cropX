@@ -1,10 +1,11 @@
+from urllib.request import Request
 from django.shortcuts import render , redirect
-from django.http import response
-from django.http import JsonResponse , StreamingHttpResponse 
+from django.http import JsonResponse, StreamingHttpResponse, HttpResponse
 from django.conf import settings
 from threading import Thread
-import random , string , os , json , time
-from PIL import Image 
+import random , string , os , json 
+from PIL import Image , ImageSequence
+
 
 # These libraries are designed for different purposes.
 from tiff.utils import write_in_storage , load_saved_images , handle_file_in_chnks
@@ -13,73 +14,74 @@ from tiff.utils import write_in_storage , load_saved_images , handle_file_in_chn
 
 
 
-def UploadIMagePage(request):
-    
-    '''
-        Only render the index.html file for uploading tiff File
-    '''
-    userId = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
-    request.session['userid'] = userId
+def home_page(request:Request) -> HttpResponse:
+    "Render home page template"
+    userid = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
+    request.session['userid'] = userid
+    return render(request, 'html/home.html', {})
 
+
+
+
+def UploadImagePage(request:Request) -> HttpResponse:
+    'Only render the index.html file for uploading tiff File'
     if request.method == 'POST':
-        return render(request , 'html/index.html', {'userId':userId})
+        return render(request , 'html/uploadpage.html', {})
     
-    return render(request , 'html/index.html' , {'userId' : userId})
+    return render(request , 'html/uploadpage.html' , {})
 
 
 
 
-def ExtractingImages(request):
+
+
+
+def ExtractingImages(request:Request) -> HttpResponse:
     
     """
-        Save the tiff file in a directory based on the user-id that stored in request.session 
-        and then exctracting IMG's inside the tiff file and saving them 
-        also render them inside an html file inside 'html/showimages.html'
-        
-        - this function view uses Thread to handle extracting img's
+        - Exctract img's inside the tiff file
         
     """
-    if request.method != 'POST':
-        return JsonResponse({'status' : 405 , 'msg':'method not supported'}) 
-    
-
-    ImageForm = request.FILES.get('tiff-image') 
-    prefersaving = request.POST.get('preferinput') 
-    UserSessionId = request.session.get('userid')
-
-
-    if ImageForm.content_type not in ['image/tiff' , 'image/x-tiff']:
-        return render(request , 'html/notuploaded.html', {'status':415 , 'msg':'File not supported'}) 
-        
-        
-    if not UserSessionId :
-        return JsonResponse({'status': 400, 'data': 'Invalid session data'})
-
-
     try:
-        ImagesPath = [] # shared list with other thread(core/ process) to access image's extracting
+        if request.method != 'POST':
+            return JsonResponse({'status' : 405 , 'msg':'method not supported'}) 
+        
+        ImageForm = request.FILES.get('tiff-image')  
+        UserSessionId = request.session.get('userid')
+
+        if ImageForm.content_type not in ['image/tiff' , 'image/x-tiff']:
+            return render(request , 'html/wrongupload.html', {'status':415 , 'msg':'File not supported'}) 
+            
+        if not UserSessionId :
+            return JsonResponse({'status': 400, 'data': 'Invalid session data'})
+
+        ImagesPath = [] 
         MakeDirBaseOnUser = os.path.join(settings.MEDIA_ROOT, UserSessionId)
         os.makedirs(MakeDirBaseOnUser, exist_ok=True) 
                     
         TiffImagePath = os.path.join(MakeDirBaseOnUser, ImageForm.name) 
         write_in_storage(TiffImagePath, ImageForm)
 
-        thread = Thread(target=load_saved_images, args=(TiffImagePath, ImageForm, MakeDirBaseOnUser, UserSessionId, prefersaving, ImagesPath))
-        thread.start()
-        thread.join() # end of the thread activity 
-
+        with Image.open(TiffImagePath) as opImg:
+            for ind , page in enumerate(ImageSequence.Iterator(opImg) , 1):
+                ImageFileName = f'{os.path.splitext(ImageForm.name)[0]}_page_{ind}.png'
+                ImagePath = os.path.join(MakeDirBaseOnUser , ImageFileName)
+                page.save(ImagePath , 'PNG' , optimize=True)
+                ImagesPath.append(f"/media/{UserSessionId}/{ImageFileName}")
+                
+                
         request.session['tiffname'] = ImageForm.name
         request.session['imagesorder'] = ImagesPath 
 
         return redirect('show-images')
        
     except Exception as err:
-        return render(request , 'html/notupladed.html', {'status':500 , 'msg':'Internal server error'})
+        return render(request , 'html/wrongupload.html', {'status':500 , 'msg':'Internal server error'})
         
         
         
            
-def ShowImages(request):
+def ShowImages(request:Request) -> HttpResponse:
     """
         render image's into 'html/showimages.html'
     """
@@ -98,13 +100,13 @@ def ShowImages(request):
                 
         return render(request , 'html/showimages.html' , {'image_urls':ImagesPath})
     except Exception as err:
-        print(err)
+        
         return JsonResponse({'status':406 , 'data':'Not acceptable'})
 
 
 
 
-def RotateImg(request):
+def RotateImg(request:Request) -> HttpResponse:
           
     '''
         This section rotates the target IMG , saves it, 

@@ -1,0 +1,18 @@
+{% extends "html/base.html" %}
+
+
+
+
+
+
+{% block content %}
+
+<div class="home">
+
+    <p class="welcome"> به وبسایت ما خوش امدید</p>
+    <p class="editpage"> برای ادیت فایل های تیف خود کلیک کنید</p>
+    <button class="enterbtn"  type="button"><a href="{% url 'upload-image-page' %}">ورود به صفحه آپلود</a></button>
+
+</div>
+
+{% endblock content %}

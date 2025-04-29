@@ -1,0 +1,40 @@
+.ulheader {
+display: flex;
+align-items: center;
+flex-direction: row;
+justify-content: flex-end;
+list-style: none;
+font-size: 20px;
+background-color: aliceblue;
+height: 75px;
+border-radius: 15px;}
+
+
+
+.liheader {width: auto;
+    transition: border-radius;
+    transition-duration: 350ms;
+    transition-delay: 150ms;
+    margin-right: 25px;}
+
+
+.liheader:hover{
+    border-style: solid;
+    border-width: 0 0 2px 0 ;
+    border-radius: 5px;}
+
+
+.fa-pen-to-square {
+    margin: 5px;}
+
+
+.fa-house {
+    margin: 5px;}
+
+
+.aheader { 
+    font-weight:500;
+    text-decoration: none;
+    color: black;}
+
+

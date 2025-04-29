@@ -1,0 +1,33 @@
+{% extends "html/base.html" %}
+
+
+{% block content %}   
+<div class="main">
+
+    <div class="sideright">
+        <form id='imform' action="{% url 'extracting-images-page' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="upload images " class="label-up">فایل با فرمت تیف اپلود کنید</label>
+            
+            <div class="input-group mb-3">
+        
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input " id="inputGroupFile01" name="tiff-image" accept=".tiff,.tif"  >
+                    <label class="custom-file-label" for="inputGroupFile">فایل انتخاب کنید</label>
+                </div>
+            </div>
+
+            <button id='submitbtn' type="submit">اپلود</button>
+            <p id="loadingmsg" style="display: none;"> ..:: درحال‌پردازش ::..</p>
+        </form>
+    </div>
+
+    <div class="sideleft">
+        <p class="leftp">فایل تیف خود را همین حالا وارد کنید و مدیریت کنید</p>
+    </div>
+
+</div>  
+
+
+
+{% endblock content %}

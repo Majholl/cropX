@@ -1,0 +1,31 @@
+.home {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+.enterbtn { 
+    padding: 10px;
+    width: 250px;
+    height: 50px;
+    font-size: 18px;
+    background: azure;
+    border: none;
+    border-radius: 15px;
+}
+
+.enterbtn:hover {
+    background: black;
+    
+}
+
+button:hover a {
+    color: white;
+}
+button a {
+    text-decoration: none;
+    color: black;
+
+} 

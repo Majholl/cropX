@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('loadingmsg').style.display = 'block'
                 el.submit()
             }else{
-                alert('Nothing selected')}
+                alert('هیچ فایلی انتخاب نشده')}
             })
 
     }
