@@ -27,7 +27,7 @@ DJNAGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',]
 
-THIRD_PARTY_APPS =  ['rest_framework', 'corsheaders']
+THIRD_PARTY_APPS =  ['rest_framework', 'corsheaders', ]
 
 LOCAL_APPS = ['apiapp.apps.ApiappConfig']
 
@@ -66,10 +66,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 #-Rest settings
 REST_FRAMEWORK = {}
-
-
-
-
 
 
 
