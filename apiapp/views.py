@@ -12,7 +12,10 @@ from PIL import Image, ImageSequence
 
 @api_view(['POST'])
 def get_file(request:Request) -> Response:
-    
+    """
+        - Upload endpoint and extacting Images from tiff file and save them.
+        - Set cookie for identifier of the user
+    """
     data = request.data 
     userid = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
     try:
@@ -51,15 +54,11 @@ def get_file(request:Request) -> Response:
 
 
 
-
-
-
-
-
-
 @api_view(['POST'])
 def rotate_img(request:Request) -> Response:
-    
+    """
+        - Rotate images into angles based on the list recieving and save them.
+    """
     data = request.data 
     cookie = request.COOKIES.get('id')
     try:
@@ -83,11 +82,11 @@ def rotate_img(request:Request) -> Response:
 
 
 
-
-
 @api_view(['POST'])
 def delete_img(request:Request) -> Response:
-    
+    """
+        - Delete images based on the list recieving. 
+    """
     data = request.data 
     cookie = request.COOKIES['id']
     try:
@@ -113,7 +112,9 @@ def delete_img(request:Request) -> Response:
 
 @api_view(['POST'])
 def reorder_img(request:Request) -> Response:
-    
+    """
+        - Reorder images based on the list recieving and also provide downlaodable link into response. 
+    """
     data = request.data 
     cookie = request.COOKIES['id']
     try:
@@ -146,7 +147,9 @@ def reorder_img(request:Request) -> Response:
     
     
 def download_file(request, id, filename):
-    
+    """
+        - Prepare requested file based on the name.
+    """
     file_path = path.join(settings.MEDIA_ROOT, id, filename)
     if path.exists(file_path):
         resp = FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
