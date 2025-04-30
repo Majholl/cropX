@@ -6,8 +6,7 @@ from rest_framework import status
 import string , random , os
 from os import path
 from PIL import Image, ImageSequence
-from datetime import timedelta
-
+from django.http import FileResponse, Http404
 
 
 
@@ -102,3 +101,44 @@ def delete_img(request:Request) -> Response:
     except Exception as err:
         return Response({'msg':'Internal server error.', 'status':500, 'error':str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+
+
+
+
+
+@api_view(['POST'])
+def reorder_img(request:Request) -> Response:
+    
+    data = request.data 
+    cookie = request.COOKIES['id']
+    try:
+        img = []
+        
+        for i in data['file']:
+            relative_path = i.replace('/media/', '')
+            path_img = os.path.join(settings.MEDIA_ROOT, relative_path)
+            img.append(Image.open(path_img))
+        
+        
+        new_file =  f'editedimg.tiff'
+        output_dir = os.path.join(settings.MEDIA_ROOT, cookie, new_file)
+        img[0].save(output_dir, save_all=True, append_images = img[1:], format="TIFF", compression='tiff_deflate')
+        
+        download = request.build_absolute_uri(f'/api/download/{new_file}')
+        resp = Response({'msg':'Reordering successfully completed.', 'status':200, 'data':download}, status=status.HTTP_200_OK)
+        return resp
+    
+    except Exception as err:
+        return Response({'msg':'Internal server error.', 'status':500, 'error':str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
+    
+    
+def download_file(request, filename):
+    cookie = request.COOKIES['id']
+    file_path = path.join(settings.MEDIA_ROOT, cookie, filename)
+    if path.exists(file_path):
+        resp = FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+        return resp
+    else:
+        return Http404('file not found.')

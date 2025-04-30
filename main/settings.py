@@ -9,10 +9,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 load_env = path.join(BASE_DIR, '.env')
+
 if path.isfile(load_env) :
+    
     load_dotenv(load_env)
 
-print(load_dotenv(load_env))
+
 
 
 
