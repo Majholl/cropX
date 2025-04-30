@@ -2,12 +2,11 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.conf import settings
+from django.http import FileResponse, Http404
 from rest_framework import status
 import string , random , os
 from os import path
 from PIL import Image, ImageSequence
-from django.http import FileResponse, Http404
-
 
 
 
@@ -42,7 +41,7 @@ def get_file(request:Request) -> Response:
                 page.save(image_path, 'PNG')
                 images.append(f'/media/{userid}/{image_name}')
         resp = Response({'msg':'Request successfully.', 'status':201, 'id':userid, 'data':images}, status=status.HTTP_201_CREATED)
-        Response.set_cookie(resp, 'id', userid, max_age=3600)
+        Response.set_cookie(resp, 'id', userid, max_age=3600, secure=True, samesite='Lax', httponly=True)
         return resp
     
     except Exception as err:
@@ -62,8 +61,11 @@ def get_file(request:Request) -> Response:
 def rotate_img(request:Request) -> Response:
     
     data = request.data 
-    cookie = request.COOKIES['id']
+    cookie = request.COOKIES.get('id')
     try:
+        if not cookie:
+            return Response({'msg':'Missing ID cookie.', 'status':400}, status=status.HTTP_400_BAD_REQUEST)
+        
         keys = data.keys()
         for key, values in data.items():    
             relative_path = key.replace('/media/', '')
@@ -89,6 +91,9 @@ def delete_img(request:Request) -> Response:
     data = request.data 
     cookie = request.COOKIES['id']
     try:
+        if not cookie:
+            return Response({'msg':'Missing ID cookie.', 'status':400}, status=status.HTTP_400_BAD_REQUEST)
+        
         keys = data.keys()
         for key in data:    
             relative_path = key.replace('/media/', '')
@@ -112,6 +117,9 @@ def reorder_img(request:Request) -> Response:
     data = request.data 
     cookie = request.COOKIES['id']
     try:
+        if not cookie:
+            return Response({'msg':'Missing ID cookie.', 'status':400}, status=status.HTTP_400_BAD_REQUEST)
+        
         img = []
         
         for i in data['file']:
@@ -120,11 +128,11 @@ def reorder_img(request:Request) -> Response:
             img.append(Image.open(path_img))
         
         
-        new_file =  f'editedimg.tiff'
+        new_file =  f'editedimg_{cookie}.tiff'
         output_dir = os.path.join(settings.MEDIA_ROOT, cookie, new_file)
-        img[0].save(output_dir, save_all=True, append_images = img[1:], format="TIFF", compression='tiff_deflate')
+        img[0].save(output_dir, save_all=True, append_images=img[1:], format="TIFF", compression='tiff_adobe_deflate')
         
-        download = request.build_absolute_uri(f'/api/download/{new_file}')
+        download = request.build_absolute_uri(f'/api/download/{cookie}/{new_file}')
         resp = Response({'msg':'Reordering successfully completed.', 'status':200, 'data':download}, status=status.HTTP_200_OK)
         return resp
     
@@ -134,11 +142,15 @@ def reorder_img(request:Request) -> Response:
     
     
     
-def download_file(request, filename):
-    cookie = request.COOKIES['id']
-    file_path = path.join(settings.MEDIA_ROOT, cookie, filename)
+    
+    
+    
+def download_file(request, id, filename):
+    
+    file_path = path.join(settings.MEDIA_ROOT, id, filename)
     if path.exists(file_path):
         resp = FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+        resp.delete_cookie('id')
         return resp
     else:
         return Http404('file not found.')

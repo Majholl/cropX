@@ -10,5 +10,5 @@ urlpatterns = [
     path('rotate/', rotate_img, name='Rotate-imgs'),
     path('delete/', delete_img, name='Delete-imgs'),
     path('reorder/', reorder_img, name='Reorder-imgs'),
-    path('download/<str:filename>', download_file, name='Download-file')
+    path('download/<str:id>/<str:filename>', download_file, name='Download-file')
 ]
