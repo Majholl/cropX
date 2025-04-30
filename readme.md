@@ -1,83 +1,93 @@
-<h1 style="text-align: center;">CropX - Tiff file Processing Tool</h1>
+# <p align="center">🌿 CropX - TIFF File Processing Tool</p>
 
-<p> CropX is a Django-based Tiff file processing tool that allows users to manipulate .tiff images, including 
+CropX is a Django-based TIFF file processing tool that allows users to manipulate `.tiff` images, including rotation, deletion, and reordering.
 
+---
 
-# Features
--✅ Upload and process tiff file 
+## ✅ Features
 
--✅ Rotate, delete and reorder images
+- Upload and process TIFF files  
+- Rotate, delete, and reorder images  
+- Recreate TIFF file with changes and prepare it for download  
 
--✅ Recreate tiff file by adding changes and prepare if for download 
+---
 
+## 🔧 Tech Stack
 
-# 🔧 Tech Stack
-- <b>FronEnd by</b> : <a href='https://github.com/PAPAshady'><img src='icon/PAPAshady.jpg' width="20px" height="20px" style='border-radius:20px'></img>PAPAshady</a>
+- **Frontend by**:  
+  [<img src="icon/PAPAshady.jpg" width="20px" height="20px" style="border-radius:50%;"> PAPAshady](https://github.com/PAPAshady)
 
-- <b>BackEnd by</b> : <a href='https://github.com/Majholl'><img src='icon/Majholl.jpg' width="20px" height="20px" style='border-radius:20px'></img>Majholl</a> 
+- **Backend by**:  
+  [<img src="icon/Majholl.jpg" width="20px" height="20px" style="border-radius:50%;"> Majholl](https://github.com/Majholl)
 
+- **Language**: Python  
+- **Backend**: Django / Django REST Framework  
+- **Database**: – (No database used or specified)
 
-- <b>Language</b> : Python
+> **Special thanks** to [PAPAshady](https://github.com/PAPAshady/tiff-viewer) for building the frontend UI.
 
-- <b>BackEnd</b> : Django / Rest-Framework 
+---
 
-- <b>Databse</b> : -
+## ⚙️ Requirements
 
+- Python: `3.11.5`  
+- Django: `5.2`  
+- Pillow: `11.1.0`  
 
-** Special thanks to PAPAshady for making it's frontend page <a href='https://github.com/PAPAshady/tiff-viewer'>Front end repo</a>
-
-<hr>
-
-### Requirements
-- python = 3.11.5
-- django = 5.2
-- pillow = 11.1.0
-
-
+---
 
 ## 📌 API Endpoints
- 
-| EndPoint |  Method | Description |
-|----------|----------|----------|
-| api/upload | POST | Upload tiff file|
-| api/rotate | POST | Rotate list of imgs |
-| api/delete | POST | Delete list of imgs|
-| api/reorder| POST | Rorder list of imgs |
 
-<b>Full doc </b>: <a href='https://www.postman.com/grey-escape-224969/workspace/nameless'>Full Documentation api requests</a>
+| Endpoint        | Method | Description               |
+|-----------------|--------|---------------------------|
+| `/api/upload`   | POST   | Upload TIFF file          |
+| `/api/rotate`   | POST   | Rotate list of images     |
+| `/api/delete`   | POST   | Delete list of images     |
+| `/api/reorder`  | POST   | Reorder list of images    |
 
+**Full docs**: [Postman API Collection](https://www.postman.com/grey-escape-224969/workspace/nameless)
 
+---
 
-#### How to run
-⚠️  <b>dont forget to make .env file in same as the project folder and populate it with .env.exmaple  </b>
+## 🚀 How to Run
 
-- First install python <a href='https://www.python.org/'>Python Page</a>
-- Simply clone the project 
-- Make <a href='https://stackoverflow.com/questions/43069780/how-to-create-virtual-env-with-python-3'>venv and activating it </a>
-- After successfully activating run following command to install dependent libraries :
-```bash 
->>> pip install -r requiremenets.txt
+⚠️ **Don't forget to create a `.env` file in the project root and copy contents from `.env.example`.**
+
+### 1. Install Python
+
+Get it from the [official site](https://www.python.org/)
+
+### 2. Clone the Project
+<details>
+<summary>📌Click to expand this section</summary>
+
+```bash
+git clone https://github.com/your-username/cropx.git # Clone the repo
+cd cropx 
+python -m venv venv # Make python env
+
+# Activate it:
+source venv/bin/activate  # For macOS/Linux
+venv\Scripts\activate     # For Windows
+
+pip install -r requirements.txt # Install depencies
+
+python manage.py migrate # Add model to db
+python manage.py runserver # Run server
+
 ```
-- Run these command's in a single line
-```bash 
->>> py manage.py migrate 
-```
-
-- Finally run the server 
-``` bash 
->>> py manage.py runserver
-```
-
-<a href="http://127.0.0.1:8000/" target="_blank">
-  🚀 The server is running! Click here to open it in your browser.
-</a>
-
+Now visit: http://127.0.0.1:8000/
+</details>
 
 <hr>
 
+### 💬 Contributors
+Built with ❤️ by:
+- Frontend: PAPAshady
+- Backend: Majholl
 
 
 #### License
 
-This project is open-source and free to use.
-Feel free to open issues or submit pull requests! 🚀
+This project is licensed as open-source and is free to use and contribute to.
+Feel free to fork, star ⭐, or submit issues and PRs 🚀
