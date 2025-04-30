@@ -1,64 +1,65 @@
-<div style="text-align: center;">
-  <img src="./icon/Capture.JPG" width="250px" height="200px" />
-</div>
+<h1 style="text-align: center;">CropX - Tiff file Processing Tool</h1>
 
-<h1 style="text-align: center;">CropX - Image Processing Tool</h1>
-
-<p> CropX is a Django-based image processing tool that allows users to manipulate .tiff images, including  <b>rotating</b>, <b>reordering</b>, <b>deleting</b> and merging multiple images into a single TIFF file. The project is designed for efficient image handling in web applications</p>
+<p> CropX is a Django-based Tiff file processing tool that allows users to manipulate .tiff images, including 
 
 
 # Features
--✅ Upload and process .tiff images
+-✅ Upload and process tiff file 
 
--✅ Rotate and Delete images easily
+-✅ Rotate, delete and reorder images
 
--✅ Merge multiple images into a single .tiff file
-
--✅ Download the processed file
-
--✅ Supports Django backend with JavaScript (Fetch API) frontend
+-✅ Recreate tiff file by adding changes and prepare if for download 
 
 
-## Tech Stack
--Backend:  <b>Django, Pillow (PIL)</b>
+# 🔧 Tech Stack
+- <b>FronEnd by</b> : <a href='https://github.com/PAPAshady'><img src='icon/PAPAshady.jpg' width="20px" height="20px" style='border-radius:20px'></img>PAPAshady</a>
 
--Frontend: <b> JavaScript (Fetch API, Sortable.js)</b>
+- <b>BackEnd by</b> : <a href='https://github.com/Majholl'><img src='icon/Majholl.jpg' width="20px" height="20px" style='border-radius:20px'></img>Majholl</a> 
 
--Database:  <b>SQLite</b> (can be switched to PostgreSQL or MySQL for you own purpose)
 
--Version Control: <b>Git & GitHub</b>
+- <b>Language</b> : Python
+
+- <b>BackEnd</b> : Django / Rest-Framework 
+
+- <b>Databse</b> : -
+
+
+** Special thanks to PAPAshady for making it's frontend page <a href='https://github.com/PAPAshady/tiff-viewer'>Front end repo</a>
 
 <hr>
 
 ### Requirements
 - python = 3.11.5
-- django = 5.1.6
-- pillow 11.1.0
+- django = 5.2
+- pillow = 11.1.0
+
+
+
+## 📌 API Endpoints
+ 
+| EndPoint |  Method | Description |
+|----------|----------|----------|
+| api/upload | POST | Upload tiff file|
+| api/rotate | POST | Rotate list of imgs |
+| api/delete | POST | Delete list of imgs|
+| api/reorder| POST | Rorder list of imgs |
+
+<b>Full doc </b>: <a href='https://www.postman.com/grey-escape-224969/workspace/nameless'>Full Documentation api requests</a>
+
 
 
 #### How to run
-- First download Python on  <img src='./icon/pngwing.com.png' width='15px' height='15px'> <a href='https://www.python.org/'>Python Page</a>
+⚠️  <b>dont forget to make .env file in same as the project folder and populate it with .env.exmaple  </b>
+
+- First install python <a href='https://www.python.org/'>Python Page</a>
 - Simply clone the project 
-- Make venv 
-```bash
->>> python -m venv .venv
-```
-
-- activate it by navigating to 
-``` bash
-  >>> cd .venv/Sctipts/
-  >>> activate or activate.bat
-  >>> cd ../..
-```
-
-- After successfully activating run following command to install dependent libraries 
+- Make <a href='https://stackoverflow.com/questions/43069780/how-to-create-virtual-env-with-python-3'>venv and activating it </a>
+- After successfully activating run following command to install dependent libraries :
 ```bash 
->>> pip install requiremenets.txt
+>>> pip install -r requiremenets.txt
 ```
-
 - Run these command's in a single line
 ```bash 
->>> py manage.py makemigrations 
 >>> py manage.py migrate 
 ```
 
@@ -74,8 +75,9 @@
 
 <hr>
 
+
+
 #### License
 
 This project is open-source and free to use.
-
 Feel free to open issues or submit pull requests! 🚀
