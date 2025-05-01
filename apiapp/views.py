@@ -88,7 +88,7 @@ def delete_img(request:Request) -> Response:
         - Delete images based on the list recieving. 
     """
     data = request.data 
-    cookie = request.COOKIES['id']
+    cookie = request.COOKIES.get('id')
     try:
         if not cookie:
             return Response({'msg':'Missing ID cookie.', 'status':400}, status=status.HTTP_400_BAD_REQUEST)
@@ -116,7 +116,7 @@ def reorder_img(request:Request) -> Response:
         - Reorder images based on the list recieving and also provide downlaodable link into response. 
     """
     data = request.data 
-    cookie = request.COOKIES['id']
+    cookie = request.COOKIES.get('id')
     try:
         if not cookie:
             return Response({'msg':'Missing ID cookie.', 'status':400}, status=status.HTTP_400_BAD_REQUEST)
