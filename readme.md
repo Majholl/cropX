@@ -73,7 +73,7 @@ venv\Scripts\activate     # For Windows
 pip install -r requirements.txt # Install depencies
 
 python manage.py migrate # Add model to db
-python manage.py runserver # Run server
+python manage.py runserver localhost:8000 # Run server
 
 ```
 Now visit: http://127.0.0.1:8000/

@@ -41,7 +41,8 @@ def get_file(request:Request) -> Response:
             for ind, page in enumerate(ImageSequence.Iterator(img), 1):
                 image_name = f'{os.path.splitext(data["file"].name)[0]}_page_{ind}.png'
                 image_path = os.path.join(make_directory, image_name)
-                page.save(image_path, 'PNG')
+                page.save(image_path, 'PNG',)
+                page.save(image_path, 'WebP',)
                 images.append(f'/media/{userid}/{image_name}')
         resp = Response({'msg':'Request successfully.', 'status':201, 'id':userid, 'data':images}, status=status.HTTP_201_CREATED)
         Response.set_cookie(resp, 'id', userid, max_age=3600, secure=True, samesite='None', httponly=True)
