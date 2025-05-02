@@ -5,7 +5,6 @@ import shutil
 from datetime import datetime
 
 
-settings.configure()
 
 def delete_useless_files():
     try:        

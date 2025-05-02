@@ -4,7 +4,7 @@
 .venv/
 .vevn
 # Environment files (except example)
-.env
+!.env
 .env.*
 !.envs/.env.example
 !.env.example
