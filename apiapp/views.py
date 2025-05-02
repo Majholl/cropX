@@ -44,7 +44,7 @@ def get_file(request:Request) -> Response:
                 page.save(image_path, 'PNG')
                 images.append(f'/media/{userid}/{image_name}')
         resp = Response({'msg':'Request successfully.', 'status':201, 'id':userid, 'data':images}, status=status.HTTP_201_CREATED)
-        Response.set_cookie(resp, 'id', userid, max_age=3600, secure=True, samesite='Lax', httponly=True)
+        Response.set_cookie(resp, 'id', userid, max_age=3600, secure=True, samesite='None', httponly=True)
         return resp
     
     except Exception as err:
